@@ -1,0 +1,22 @@
+package webcat;
+
+import webcat.utils.ConEnum;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
+
+/**
+ * Created by dengfan on 2017/3/14.
+ */
+public class Test1 {
+    public static void main(String[] args) {
+       String url = "http://www.bmbang.cc/";
+
+        try {
+            System.out.println(URLEncoder.encode(url, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}

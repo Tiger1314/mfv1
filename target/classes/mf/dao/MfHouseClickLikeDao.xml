@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfHouseClickLikeDao">
+
+	<select id="queryObject" resultType="mf.entity.MfHouseClickLikeEntity">
+		select * from mf_house_click_like where id = #{value}
+	</select>
+
+	<select id="queryMylike" resultType="mf.entity.MfHouseClickLikeEntity">
+		select * from mf_house_click_like where `click_id` = #{clickId} and `open_id` = #{openId}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfHouseClickLikeEntity">
+		select * from mf_house_click_like
+		where 1 = 1
+		<if test="clickId != null">
+			and `click_id` = #{clickId}
+		</if>
+		<if test="openId != null">
+			and `open_id` = #{openId}
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_house_click_like
+		where 1 = 1
+		<if test="clickId != null">
+			and `click_id` = #{clickId}
+		</if>
+		<if test="openId != null">
+			and `open_id` = #{openId}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfHouseClickLikeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_house_click_like
+		(
+			`click_id`, 
+			`open_id`, 
+			`create_time`
+		)
+		values
+		(
+			#{clickId}, 
+			#{openId}, 
+			#{createTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfHouseClickLikeEntity">
+		update mf_house_click_like 
+		<set>
+			<if test="clickId != null">`click_id` = #{clickId}, </if>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_house_click_like where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_house_click_like where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfRechargeOrderDao">
+
+	<select id="queryObject" resultType="mf.entity.MfRechargeOrderEntity">
+		select * from mf_recharge_order where id = #{value}
+	</select>
+
+	<select id="queryObjectByOrderNo" resultType="mf.entity.MfRechargeOrderEntity">
+		select * from mf_recharge_order where `order_no` = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfRechargeOrderEntity">
+		select * from mf_recharge_order
+		where `status` = 1
+		<if test="openId != null">
+			and open_id = #{openId}
+		</if>
+		<if test="nickname != null">
+			and nickname like CONCAT('%',#{nickname},'%')
+		</if>
+		<if test="orderType != null and orderType != 0">
+			and order_type = #{orderType}
+		</if>
+		<if test="houseId != null and houseId != 0">
+			and house_id = #{houseId}
+		</if>
+		order by create_time desc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(1) from mf_recharge_order
+		WHERE status = 1
+		<if test="openId != null">
+			and open_id = #{openId}
+		</if>
+		<if test="nickname != null">
+			and nickname like CONCAT('%',#{nickname},'%')
+		</if>
+		<if test="houseId != null and houseId != 0">
+			and house_id = #{houseId}
+		</if>
+		<if test="cz != null">
+			and order_no is not NULL
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfRechargeOrderEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_recharge_order
+		(
+			`order_no`, 
+			`recharge_id`, 
+			`des`, 
+			`status`, 
+			`create_time`,
+			`open_id`,
+			`title`,
+			`oper_type`,
+			`order_type`,
+			`nickname`,
+			`house_id`
+		)
+		values
+		(
+			#{orderNo}, 
+			#{rechargeId}, 
+			#{des}, 
+			#{status}, 
+			#{createTime},
+			#{openId},
+			#{title},
+			#{operType},
+			#{orderType},
+			#{nickname},
+			#{houseId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfRechargeOrderEntity">
+		update mf_recharge_order 
+		<set>
+			<if test="orderNo != null">`order_no` = #{orderNo}, </if>
+			<if test="rechargeId != null">`recharge_id` = #{rechargeId}, </if>
+			<if test="des != null">`des` = #{des}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="openId != null">`open_id` = #{openId},</if>
+			<if test="title != null">`title` = #{title},</if>
+			<if test="operType != null">`oper_type` = #{operType},</if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_recharge_order where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_recharge_order where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

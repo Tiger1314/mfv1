@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfHouseCollectDao">
+
+	<select id="queryObject" resultType="mf.entity.MfHouseCollectEntity">
+		select * from mf_house_collect where id = #{value}
+	</select>
+
+	<select id="queryMyCollect" resultType="mf.entity.MfHouseInfoEntity">
+		select * from mf_house_info
+		where id in (select `house_id` from mf_house_collect where `open_id` = #{openId})
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_house_collect
+		where 1 = 1
+		<if test="houseId != null">
+			and `house_id` = #{houseId}
+		</if>
+		<if test="openId != null">
+			and `open_id` = #{openId}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfHouseCollectEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_house_collect
+		(
+			`house_id`, 
+			`open_id`, 
+			`create_time`
+		)
+		values
+		(
+			#{houseId}, 
+			#{openId}, 
+			#{createTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfHouseCollectEntity">
+		update mf_house_collect 
+		<set>
+			<if test="houseId != null">`house_id` = #{houseId}, </if>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_house_collect where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_house_collect where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfHouseClickDao">
+
+	<select id="queryObject" resultType="mf.entity.MfHouseClickEntity">
+		select * from mf_house_click where id = #{value}
+	</select>
+
+	<select id="queryObjectByOpenId" resultType="mf.entity.MfHouseClickEntity">
+		select * from mf_house_click where open_id = #{openId} and `house_id` = #{houseId} limit 1
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfHouseClickEntity">
+		select * from mf_house_click
+		where 1 = 1
+		<if test="houseId != null">
+			and `house_id` = #{houseId}
+		</if>
+		<if test="openId != null">
+			and `open_id` = #{openId}
+		</if>
+		order by `create_time` ASC
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_house_click
+		where 1 = 1
+		<if test="houseId != null">
+			and `house_id` = #{houseId}
+		</if>
+		<if test="openId != null">
+			and `open_id` = #{openId}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfHouseClickEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_house_click
+		(
+			`open_id`, 
+			`house_id`, 
+			`create_time`
+		)
+		values
+		(
+			#{openId}, 
+			#{houseId}, 
+			#{createTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfHouseClickEntity">
+		update mf_house_click 
+		<set>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="houseId != null">`house_id` = #{houseId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_house_click where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_house_click where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

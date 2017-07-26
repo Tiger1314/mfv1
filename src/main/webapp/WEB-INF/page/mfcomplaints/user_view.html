@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+    <div class="grid-btn">
+        <input type="button" class="btn btn-warning" @click="back" value="返回"/>
+    </div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+</div>
+
+<script src="${rc.contextPath}/js/mfcomplaints/user_view.js?_${date.systemTime}"></script>
+</body>
+</html>

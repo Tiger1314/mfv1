@@ -1,0 +1,121 @@
+    /**
+     * 推送夜间消息 21:00 - 8:00
+     */
+    public void pushNightMessage_old(){
+
+        int h = DateUtils.getHour();
+
+        if(h == 8 && MessageConstants.NIGHT_HOUSE_MESSAGE.size() != 0){
+
+            for(String openId : MessageConstants.NIGHT_HOUSE_MESSAGE.keySet()){
+
+                MfUserEntity user = mfUserService.queryObject(openId);
+
+                if(DateUtils.daysBetween(DateUtils.getTodayDate(), user.getExpireDate()) > 0 || user.getWnb() > 0){
+                    int count = MessageConstants.NIGHT_HOUSE_MESSAGE.get(openId);
+
+                    if(count != 0){
+                        String mes = "主人！昨晚休息得还好吗？  小蜗一宿没睡，为您收集了" +
+                                MessageConstants.NIGHT_HOUSE_MESSAGE.get(openId) +
+                                "条房源信息，请主人及时批阅！" +
+                                "<a href='" + Menu.getMenuUrl(ConEnum.Menu.FYGC.getValue()) + "'>【查看详情】</a>";
+
+                        Message message = new Message();
+                        boolean flag = message.sendTextMessage(mes, openId);
+
+                        //发送成功扣费
+                        if(flag){
+//                            pushService.pushCallBack(openId);
+                            mfUserService.deductions(openId, "夜间消息", "蜗牛壳", "-1", 0);
+                        }
+
+                        //为每一个用户推送消息
+                        logger.info("为用户：" + openId + " 推送了一条夜间消息.共有房源：" );
+                        mfPushLogService.savePushLog(openId, MessageConstants.NIGHT_HOUSE_MESSAGE.get(openId), 11);
+                    }
+                }
+
+                MessageConstants.NIGHT_HOUSE_MESSAGE.put(openId, 0);
+            }
+        }
+    }
+
+
+
+     /**
+         * 推送勿扰消息 12:00   17:00   21:00
+         */
+        public void pushWrMessage_old(){
+
+            int h = DateUtils.getHour();
+            int m = DateUtils.getMinute();
+
+            if((h == 9 || h == 12 || h == 20) && MessageConstants.WR_HOUSE_MESSAGE.size() != 0 && m <= 2){
+
+                for(String openId : MessageConstants.WR_HOUSE_MESSAGE.keySet()){
+
+                    MfUserEntity user = mfUserService.queryObject(openId);
+
+                    if(DateUtils.daysBetween(DateUtils.getTodayDate(), user.getExpireDate()) > 0 || user.getWnb() > 0){
+                        int count = MessageConstants.WR_HOUSE_MESSAGE.get(openId);
+
+                        if(count != 0 && user.getWrStatus() == 1){
+    //                        String smes = "主人，您已开启勿扰模式，这段时间小蜗为您收集了" +
+    //                                MessageConstants.WR_HOUSE_MESSAGE.get(openId) +
+    //                                "条房源信息，请主人及时批阅！" +
+    //                                "<a href='" + Menu.getMenuUrl(ConEnum.Menu.FYGC.getValue()) + "'>【查看详情】</a>";
+
+    //                        Message message = new Message();
+    //                        boolean flag = message.sendTextMessage(smes, openId);
+
+                            Template t = new Template();
+
+                            String rm = t.sendWrMessage(openId, MessageConstants.WR_HOUSE_MESSAGE.get(openId));
+
+                            //发送成功扣费
+                            if("0".equals(rm)){
+    //                            pushService.pushCallBack(openId);
+                                MessageConstants.WR_HOUSE_MESSAGE.put(openId, 0);
+
+                                mfUserService.deductions(openId, "勿扰模式", "蜗牛壳", "-1", 0);
+                            }
+
+                            //为每一个用户推送消息
+                            logger.info("为用户：" + openId + " 推送了一条勿扰消息.共有房源：");
+                            mfPushLogService.savePushLog(openId, MessageConstants.WR_HOUSE_MESSAGE.get(openId), 12);
+                        }
+                    }
+
+                    MessageConstants.WR_HOUSE_MESSAGE.put(openId, 0);
+                }
+            }
+        }
+
+
+            /**
+             * 推送勿扰消息 8:00
+             */
+            public void pushWrMessage8AM(){
+                if(MessageConstants.WR_HOUSE_MESSAGE.size() != 0){
+
+                    for(String openId : MessageConstants.WR_HOUSE_MESSAGE.keySet()){
+
+                        String mes = "主人！昨晚休息得还好吗？  小蜗一宿没睡，为您收集了" +
+                                MessageConstants.WR_HOUSE_MESSAGE.get(openId) +
+                                "条房源信息，请主人及时批阅！" +
+                                "<a href='" + Menu.getMenuUrl(ConEnum.Menu.FYGC.getValue()) + "'>【查看详情】</a>";
+
+                        Message message = new Message();
+                        boolean flag = message.sendTextMessage(mes, openId);
+
+                        //发送成功扣费
+                        if(flag){
+        //                    pushService.pushCallBack(openId);
+                            MessageConstants.WR_HOUSE_MESSAGE.remove(openId);
+                        }
+
+                        //为每一个用户推送消息
+                        logger.info("为用户：" + openId + " 推送了一条勿扰消息.共有房源：");
+                    }
+                }
+            }

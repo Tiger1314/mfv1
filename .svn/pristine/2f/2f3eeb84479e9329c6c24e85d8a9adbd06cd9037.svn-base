@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfUserDao">
+
+	<select id="queryObject" resultType="mf.entity.MfUserEntity">
+		select * from mf_user where open_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfUserEntity">
+		select * from mf_user
+		where 1 = 1
+		<if test="status != null">
+			and `status` = #{status}
+		</if>
+		<if test="hous48 != null">
+			and `last_time` >= (NOW()-INTERVAL 40 HOUR)
+			and (NOW()-INTERVAL 41 HOUR) >= `last_time`
+		</if>
+		<if test="vip != null">
+			and `expire_date` >= (NOW()-INTERVAL 72 HOUR)
+			and (NOW()-INTERVAL 96 HOUR) >= `expire_date`
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_user
+		where 1 = 1
+		<if test="status != null">
+			and `status` = #{status}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfUserEntity">
+		insert into mf_user
+		(
+			`open_id`, 
+			`mobile`, 
+			`expire_date`, 
+			`nickname`, 
+			`headimgurl`, 
+			`sex`, 
+			`city`, 
+			`country`, 
+			`province`, 
+			`remark`,
+			`wnb`,
+			`last_time`,
+			`ad_show`,
+			`status`,
+			`create_time`, 
+			`update_time`, 
+			`attr1`, 
+			`attr2`, 
+			`attr3`, 
+			`attr4`
+		)
+		values
+		(
+			#{openId}, 
+			#{mobile}, 
+			#{expireDate}, 
+			#{nickname}, 
+			#{headimgurl}, 
+			#{sex}, 
+			#{city}, 
+			#{country}, 
+			#{province}, 
+			#{remark},
+			#{wnb},
+			#{lastTime},
+			#{adShow}
+			#{status},
+			#{createTime}, 
+			#{updateTime}, 
+			#{attr1}, 
+			#{attr2}, 
+			#{attr3}, 
+			#{attr4}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfUserEntity">
+		update mf_user 
+		<set>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="expireDate != null">`expire_date` = #{expireDate}, </if>
+			<if test="nickname != null">`nickname` = #{nickname}, </if>
+			<if test="headimgurl != null">`headimgurl` = #{headimgurl}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="city != null">`city` = #{city}, </if>
+			<if test="country != null">`country` = #{country}, </if>
+			<if test="province != null">`province` = #{province}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="wnb != null">`wnb` = #{wnb}, </if>
+			<if test="lastTime != null">`last_time` = #{lastTime}, </if>
+			<if test="adShow != null">`ad_show` = #{adShow}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="attr1 != null">`attr1` = #{attr1}, </if>
+			<if test="attr2 != null">`attr2` = #{attr2}, </if>
+			<if test="attr3 != null">`attr3` = #{attr3}, </if>
+			<if test="attr4 != null">`attr4` = #{attr4}</if>
+		</set>
+		where open_id = #{openId}
+	</update>
+
+	<update id="subscribe">
+		update mf_user
+		<set>
+			`status` = 2
+		</set>
+		open_id = #{value}
+	</update>
+
+	<update id="unsubscribe">
+		update mf_user
+		<set>
+			`status` = 0
+		</set>
+		open_id = #{value}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_user where open_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_user where open_id in 
+		<foreach item="openId" collection="array" open="(" separator="," close=")">
+			#{openId}
+		</foreach>
+	</delete>
+
+</mapper>

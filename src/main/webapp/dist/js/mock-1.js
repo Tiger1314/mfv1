@@ -1,0 +1,1 @@
+Mock.mock('webcat/userInfo', '../json/userInfo.json');

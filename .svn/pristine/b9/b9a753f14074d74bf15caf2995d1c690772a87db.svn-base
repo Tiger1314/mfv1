@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfHouseInfoDao">
+
+	<select id="queryObject" resultType="mf.entity.MfHouseInfoEntity">
+		select * from mf_house_info where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfHouseInfoEntity">
+		select * from mf_house_info
+		where 1 = 1
+		<if test="houseType != null">
+			and `house_type` = #{houseType}
+		</if>
+		<if test="pushedStatus != null">
+			and `pushed_status` = #{pushedStatus}
+		</if>
+		and phone REGEXP "^[1][35678][0-9]{9}$"
+		ORDER BY public_time desc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_house_info
+		where 1 = 1
+		<if test="houseType != null">
+			and `house_type` = #{houseType}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfHouseInfoEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_house_info
+		(
+			`phone`, 
+			`contact`, 
+			`address`, 
+			`unit`, 
+			`house_type`, 
+			`info_type`, 
+			`unit_price`, 
+			`total_price`, 
+			`area`, 
+			`title`, 
+			`introduction`, 
+			`pics`, 
+			`source_id`, 
+			`profile`, 
+			`url`, 
+			`public_time`, 
+			`status`, 
+			`pushed_status`, 
+			`province_code`, 
+			`city_code`, 
+			`district_code`, 
+			`business_code`, 
+			`tags`, 
+			`create_time`, 
+			`update_time`
+		)
+		values
+		(
+			#{phone}, 
+			#{contact}, 
+			#{address}, 
+			#{unit}, 
+			#{houseType}, 
+			#{infoType}, 
+			#{unitPrice}, 
+			#{totalPrice}, 
+			#{area}, 
+			#{title}, 
+			#{introduction}, 
+			#{pics}, 
+			#{sourceId}, 
+			#{profile}, 
+			#{url}, 
+			#{publicTime}, 
+			#{status}, 
+			#{pushedStatus}, 
+			#{provinceCode}, 
+			#{cityCode}, 
+			#{districtCode}, 
+			#{businessCode}, 
+			#{tags}, 
+			#{createTime}, 
+			#{updateTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfHouseInfoEntity">
+		update mf_house_info 
+		<set>
+			<if test="phone != null">`phone` = #{phone}, </if>
+			<if test="contact != null">`contact` = #{contact}, </if>
+			<if test="address != null">`address` = #{address}, </if>
+			<if test="unit != null">`unit` = #{unit}, </if>
+			<if test="houseType != null">`house_type` = #{houseType}, </if>
+			<if test="infoType != null">`info_type` = #{infoType}, </if>
+			<if test="unitPrice != null">`unit_price` = #{unitPrice}, </if>
+			<if test="totalPrice != null">`total_price` = #{totalPrice}, </if>
+			<if test="area != null">`area` = #{area}, </if>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="introduction != null">`introduction` = #{introduction}, </if>
+			<if test="pics != null">`pics` = #{pics}, </if>
+			<if test="sourceId != null">`source_id` = #{sourceId}, </if>
+			<if test="profile != null">`profile` = #{profile}, </if>
+			<if test="url != null">`url` = #{url}, </if>
+			<if test="publicTime != null">`public_time` = #{publicTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="pushedStatus != null">`pushed_status` = #{pushedStatus}, </if>
+			<if test="provinceCode != null">`province_code` = #{provinceCode}, </if>
+			<if test="cityCode != null">`city_code` = #{cityCode}, </if>
+			<if test="districtCode != null">`district_code` = #{districtCode}, </if>
+			<if test="businessCode != null">`business_code` = #{businessCode}, </if>
+			<if test="tags != null">`tags` = #{tags}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_house_info where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_house_info where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

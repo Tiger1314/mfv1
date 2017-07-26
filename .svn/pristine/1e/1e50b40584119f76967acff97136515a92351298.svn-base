@@ -1,0 +1,22 @@
+package webcat.utils;
+
+/**
+ * 常量类
+ * Created by dengfan on 2017/3/3.
+ */
+public class Constants {
+
+    //微信常量
+    public static String appID = "wx44cfb50099bb4e66";
+    public static String appsecret = "321c114f227697f3c15ef15dc96be9c5";
+    public static String weixin = "gh_fdd8951a1ff1";
+
+    //客服图片id
+    public static String png = "jHMVwbYreOwt6XasyvbrzL9cg_D_7qcQWasoZOcA3fE";
+
+    public static String service = "http://www.bmbang.cc/dist/";
+
+    //反问后台controller地址
+    public static String service_controller = "http://www.bmbang.cc/";
+
+}

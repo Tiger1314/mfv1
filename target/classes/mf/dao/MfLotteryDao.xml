@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfLotteryDao">
+
+	<select id="queryObject" resultType="mf.entity.MfLotteryEntity">
+		select * from mf_lottery where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfLotteryEntity">
+		select * from mf_lottery 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_lottery
+		where 1 = 1
+		<if test="openId != null and openId != ''">
+			and `open_id` = #{openId}
+		</if>
+		<if test="createTime != null">
+			and to_days(create_time) = to_days(now())
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfLotteryEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_lottery
+		(
+			`open_id`,
+			`nickname`,
+			`point`, 
+			`create_time`, 
+			`update_time`, 
+			`attr1`, 
+			`attr2`, 
+			`attr3`, 
+			`attr4`
+		)
+		values
+		(
+			#{openId},
+			#{nickname},
+			#{point}, 
+			#{createTime}, 
+			#{updateTime}, 
+			#{attr1}, 
+			#{attr2}, 
+			#{attr3}, 
+			#{attr4}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfLotteryEntity">
+		update mf_lottery 
+		<set>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="nickname != null">`nickname` = #{nickname}, </if>
+			<if test="point != null">`point` = #{point}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="attr1 != null">`attr1` = #{attr1}, </if>
+			<if test="attr2 != null">`attr2` = #{attr2}, </if>
+			<if test="attr3 != null">`attr3` = #{attr3}, </if>
+			<if test="attr4 != null">`attr4` = #{attr4}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_lottery where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_lottery where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

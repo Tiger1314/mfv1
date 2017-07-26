@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfPushDao">
+
+	<select id="queryObject" resultType="mf.entity.MfPushEntity">
+		select * from mf_push where open_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfPushEntity">
+		select * from mf_push
+		where `status` = 1
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_push 
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfPushEntity">
+		insert into mf_push
+		(
+			`open_id`, 
+			`house_type`, 
+			`is_sell`, 
+			`sell_type`, 
+			`sell_area`, 
+			`sell_price`, 
+			`is_buy`, 
+			`buy_type`, 
+			`buy_area`, 
+			`buy_price`, 
+			`is_rent`, 
+			`rent_type`, 
+			`rent_area`, 
+			`rent_price`, 
+			`is_qz`, 
+			`qz_type`,
+			`qz_area`,
+			`qz_price`,
+			`push_area`, 
+			`real_push_area`, 
+			`status`
+		)
+		values
+		(
+			#{openId}, 
+			#{houseType}, 
+			#{isSell}, 
+			#{sellType}, 
+			#{sellArea}, 
+			#{sellPrice}, 
+			#{isBuy}, 
+			#{buyType}, 
+			#{buyArea}, 
+			#{buyPrice}, 
+			#{isRent}, 
+			#{rentType}, 
+			#{rentArea}, 
+			#{rentPrice}, 
+			#{isQz}, 
+			#{qzType},
+			#{qzArea},
+			#{qzPrice},
+			#{pushArea}, 
+			#{realPushArea}, 
+			#{status}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfPushEntity">
+		update mf_push 
+		<set>
+			<if test="houseType != null">`house_type` = #{houseType}, </if>
+			<if test="isSell != null">`is_sell` = #{isSell}, </if>
+			<if test="sellType != null">`sell_type` = #{sellType}, </if>
+			<if test="sellArea != null">`sell_area` = #{sellArea}, </if>
+			<if test="sellPrice != null">`sell_price` = #{sellPrice}, </if>
+			<if test="isBuy != null">`is_buy` = #{isBuy}, </if>
+			<if test="buyType != null">`buy_type` = #{buyType}, </if>
+			<if test="buyArea != null">`buy_area` = #{buyArea}, </if>
+			<if test="buyPrice != null">`buy_price` = #{buyPrice}, </if>
+			<if test="isRent != null">`is_rent` = #{isRent}, </if>
+			<if test="rentType != null">`rent_type` = #{rentType}, </if>
+			<if test="rentArea != null">`rent_area` = #{rentArea}, </if>
+			<if test="rentPrice != null">`rent_price` = #{rentPrice}, </if>
+			<if test="isQz != null">`is_qz` = #{isQz}, </if>
+			<if test="qzType != null">`qz_type` = #{qz Type}, </if>
+			<if test="qzArea != null">`qz_area` = #{qz Area}, </if>
+			<if test="qzPrice != null">`qz_price` = #{qz Price}, </if>
+			<if test="pushArea != null">`push_area` = #{pushArea}, </if>
+			<if test="realPushArea != null">`real_push_area` = #{realPushArea}, </if>
+			<if test="status != null">`status` = #{status}</if>
+		</set>
+		where open_id = #{openId}
+	</update>
+	
+	<update id="delete">
+		update mf_push
+		<set>
+			`status` = 0
+		</set>
+		where open_id = #{value}
+	</update>
+	
+	<delete id="deleteBatch">
+		delete from mf_push where open_id in 
+		<foreach item="openId" collection="array" open="(" separator="," close=")">
+			#{openId}
+		</foreach>
+	</delete>
+
+</mapper>

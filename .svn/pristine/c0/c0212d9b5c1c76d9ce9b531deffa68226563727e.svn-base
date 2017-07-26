@@ -1,0 +1,112 @@
+package mf.service.impl;
+
+import mf.entity.MfHouseInfoEntity;
+import mf.service.MfHouseCollectService;
+import mf.utils.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import mf.dao.MfUserDao;
+import mf.entity.MfUserEntity;
+import mf.service.MfUserService;
+
+
+
+@Service("mfUserService")
+public class MfUserServiceImpl implements MfUserService {
+	@Autowired
+	private MfUserDao mfUserDao;
+	@Autowired
+	private MfHouseCollectService mfHouseCollectService;
+	
+	@Override
+	public MfUserEntity queryObject(String openId){
+
+		MfUserEntity user = mfUserDao.queryObject(openId);
+
+		user.setLaveDays(DateUtils.daysBetween(DateUtils.getTodayDate(), user.getExpireDate()));
+		//获取收藏数量
+		Map<String, Object> map = new HashMap<>();
+		map.put("openId", openId);
+		List<MfHouseInfoEntity> list = mfHouseCollectService.queryMyCollect(map);
+		user.setCollectCount(list.size());
+
+
+
+		return user;
+	}
+	
+	@Override
+	public List<MfUserEntity> queryList(Map<String, Object> map){
+
+		return mfUserDao.queryList(map);
+	}
+	
+	@Override
+	public int queryTotal(Map<String, Object> map){
+		return mfUserDao.queryTotal(map);
+	}
+	
+	@Override
+	public void save(MfUserEntity mfUser){
+		mfUser.setCreateTime(DateUtils.getTodayDate());
+		mfUser.setUpdateTime(DateUtils.getTodayDate());
+		mfUserDao.save(mfUser);
+	}
+	
+	@Override
+	public void update(MfUserEntity mfUser){
+		mfUser.setUpdateTime(DateUtils.getTodayDate());
+		mfUserDao.update(mfUser);
+	}
+	
+	@Override
+	public void delete(String openId){
+		mfUserDao.delete(openId);
+	}
+	
+	@Override
+	public void deleteBatch(String[] openIds){
+		mfUserDao.deleteBatch(openIds);
+	}
+
+	@Override
+	public void subscribe(String userId) {
+		mfUserDao.subscribe(userId);
+	}
+
+	@Override
+	public void unsubscribe(String userId) {
+		mfUserDao.unsubscribe(userId);
+	}
+
+	@Override
+	public List<MfUserEntity> getSubscribe() {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		map.put("status", 2);
+
+		return mfUserDao.queryList(map);
+	}
+
+	/**
+	 * 获取会员到期3天的用户
+	 *
+	 * @return
+	 */
+	@Override
+	public List<MfUserEntity> get3DayUser() {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		map.put("status", 1);
+		map.put("vip", 1);
+
+		return mfUserDao.queryList(map);
+	}
+}

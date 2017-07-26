@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>房源信息表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div class="panel panel-default" id="rrapp" v-cloak>
+	<div class="panel-heading">{{title}}</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">联系电话</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.phone" placeholder="联系电话"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">联系人</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.contact" placeholder="联系人"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">联系地址</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.address" placeholder="联系地址"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">房源户型</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.unit" placeholder="房源户型"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">房源类型，1为住宅，2为写字楼</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.houseType" placeholder="房源类型，1为住宅，2为写字楼"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">信息类型，1为出售，2为出租，3为求购，4为求租</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.infoType" placeholder="信息类型，1为出售，2为出租，3为求购，4为求租"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">单价（元/㎡或元/月）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.unitPrice" placeholder="单价（元/㎡或元/月）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">总价（万）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.totalPrice" placeholder="总价（万）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">面积（㎡）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.area" placeholder="面积（㎡）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">标题</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.title" placeholder="标题"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">介绍</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.introduction" placeholder="介绍"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">图片，多张逗号","分割</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.pics" placeholder="图片，多张逗号","分割"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">来源类型ID</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.sourceId" placeholder="来源类型ID"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">来源主页链接（爬虫使用）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.profile" placeholder="来源主页链接（爬虫使用）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">来源主页链接（前端展示）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.url" placeholder="来源主页链接（前端展示）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">发布时间</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.publicTime" placeholder="发布时间"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">业务字段，默认为0，-1为虚假房源，1被举报房源</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.status" placeholder="业务字段，默认为0，-1为虚假房源，1被举报房源"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">业务字段，默认为0，1已经推送</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.pushedStatus" placeholder="业务字段，默认为0，1已经推送"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">对应mf_area省code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.provinceCode" placeholder="对应mf_area省code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">对应mf_area城市code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.cityCode" placeholder="对应mf_area城市code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">对应mf_area区code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.districtCode" placeholder="对应mf_area区code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">对应mf_area区code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.businessCode" placeholder="对应mf_area区code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">标签，多个逗号分割</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.tags" placeholder="标签，多个逗号分割"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label"></div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.createTime" placeholder=""/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label"></div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfHouseInfo.updateTime" placeholder=""/>
+		    </div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="back" value="返回"/>
+		</div>
+	</form>
+</div>
+
+<script src="${rc.contextPath}/js/mfhouseinfo/mfhouseinfo_add.js?_${date.systemTime}"></script>
+</body>
+</html>

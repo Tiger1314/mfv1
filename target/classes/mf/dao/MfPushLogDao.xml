@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfPushLogDao">
+
+	<select id="queryObject" resultType="mf.entity.MfPushLogEntity">
+		select * from mf_push_log where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfPushLogEntity">
+		select * from mf_push_log 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_push_log 
+	</select>
+
+	<select id="queryMyHouse" resultType="mf.entity.MfHouseInfoEntity">
+		select * from mf_house_info
+		where 1 = 1
+		<if test="infoType != null and infoType != 2">
+			and info_type = #{infoType}
+		</if>
+		<if test="infoType != null and infoType == 2">
+			and (info_type = 2 or info_type = 5)
+		</if>
+		<if test="houseType != null">
+			and house_Type in
+			<foreach item="h" collection="houseType" open="(" separator="," close=")">
+				#{h}
+			</foreach>
+		</if>
+		<if test="pushArea != null">
+			and (
+				province_code in
+				<foreach item="p" collection="pushArea" open="(" separator="," close=")">
+					#{p}
+				</foreach>
+				OR
+				city_code in
+				<foreach item="c" collection="pushArea" open="(" separator="," close=")">
+					#{c}
+				</foreach>
+				OR
+				district_code in
+				<foreach item="d" collection="pushArea" open="(" separator="," close=")">
+					#{d}
+				</foreach>
+				OR
+				business_code in
+				<foreach item="b" collection="pushArea" open="(" separator="," close=")">
+					#{b}
+				</foreach>
+			)
+		</if>
+		and (1 != 1
+
+			<if test="isSell != null and isSell == 1">
+				or
+				(`is_sell` = 1
+				<if test="sellArea != null">
+					and `sell_area` in
+					<foreach item="sa" collection="sellArea" open="(" separator="," close=")">
+						#{sa}
+					</foreach>
+				</if>
+				<if test="sellPrice != null">
+					and `sell_price` in
+					<foreach item="sp" collection="sellPrice" open="(" separator="," close=")">
+						#{sp}
+					</foreach>
+				</if>
+				)
+			</if>
+			<if test="isBuy != null and isBuy == 1">
+				or
+				(`is_buy` = 1
+					<if test="buyArea != null">
+						and `buy_area` in
+						<foreach item="buy" collection="buyArea" open="(" separator="," close=")">
+							#{buy}
+						</foreach>
+					</if>
+					<if test="buyArea != null">
+						and `buy_price` in
+						<foreach item="bp" collection="buyPrice" open="(" separator="," close=")">
+							#{bp}
+						</foreach>
+					</if>
+				)
+			</if>
+			<if test="isRent != null and isRent == 1">
+			or
+				(`is_rent` = 1
+					<if test="rentType != null">
+						and `rent_type` in
+						<foreach item="rt" collection="rentType" open="(" separator="," close=")">
+							#{rt}
+						</foreach>
+					</if>
+					<if test="rentArea != null">
+						and `rent_area` in
+						<foreach item="ra" collection="rentArea" open="(" separator="," close=")">
+							#{ra}
+						</foreach>
+					</if>
+					<if test="rentPrice != null">
+					and `rent_price` in
+					<foreach item="rp" collection="rentPrice" open="(" separator="," close=")">
+						#{rp}
+					</foreach>
+					</if>
+				)
+			</if>
+			<if test="isQz != null and isQz == 1">
+				or
+				(`is_qz` = 1
+					<if test="qzArea != null">
+						and `qz_area` in
+						<foreach item="qa" collection="qzArea" open="(" separator="," close=")">
+							#{qa}
+						</foreach>
+					</if>
+					<if test="qzPrice != null">
+					and `qz_price` in
+					<foreach item="qp" collection="qzPrice" open="(" separator="," close=")">
+						#{qp}
+					</foreach>
+					</if>
+				)
+			</if>
+		)
+		order by `public_time` desc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfPushLogEntity">
+		insert into mf_push_log
+		(
+			`id`, 
+			`house_id`, 
+			`open_id`, 
+			`create_time`,
+			`push_type`
+		)
+		values
+		(
+			#{id}, 
+			#{houseId}, 
+			#{openId}, 
+			#{createTime},
+			#{pushType}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfPushLogEntity">
+		update mf_push_log 
+		<set>
+			<if test="houseId != null">`house_id` = #{houseId}, </if>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_push_log where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_push_log where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByOpenId">
+		delete from mf_push_log where `open_id` = #{value}
+	</delete>
+
+</mapper>

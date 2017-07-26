@@ -1,0 +1,39 @@
+package webcat;
+
+import webcat.Interaction.AccessToken;
+import webcat.utils.HttpClientUtils;
+
+/**
+ * Created by dengfan on 2017/3/4.
+ */
+public class Test {
+
+
+    public static void main(String[] args) {
+
+        String url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=";
+
+        AccessToken token = new AccessToken();
+
+        url += token.getAccessToken();
+
+        String mes = "{\n" +
+                "    \"touser\":\"oBrPNwA9VQyMbP_FXkoLXoVutOjQ\",\n" +
+                "    \"msgtype\":\"news\",\n" +
+                "    \"news\":{\n" +
+                "        \"articles\": [\n" +
+                "         {\n" +
+                "             \"title\":\"委托成功通知\",\n" +
+                "             \"description\":\"陈女士在58发布了一条房源消息\",\n" +
+                "             \"url\":\"www.baidu.com\"\n" +
+//                "             \"picurl\":\"http:\\/\\/mmbiz.qpic.cn\\/mmbiz_png\\/FJGdGdQmqJlIzwKP9A8MkXa2egEcHRRicE0x1HvAW1HIxq0AFMarnbs1KG664yCyZqKOmSiaVNKficPHDBRdNnahg\\/0?wx_fmt=png\"\n" +
+                "         }\n" +
+                "         ]\n" +
+                "    }\n" +
+                "}";
+
+        HttpClientUtils hc = new HttpClientUtils();
+
+        System.out.println(hc.post(url, mes));
+    }
+}

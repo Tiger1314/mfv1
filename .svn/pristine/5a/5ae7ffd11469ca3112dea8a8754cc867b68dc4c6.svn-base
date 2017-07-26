@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfPushLogDao">
+
+	<select id="queryObject" resultType="mf.entity.MfPushLogEntity">
+		select * from mf_push_log where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfPushLogEntity">
+		select * from mf_push_log 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_push_log 
+	</select>
+
+	<select id="queryMyHouse" resultType="mf.entity.MfHouseInfoEntity">
+		select * from mf_house_info where id IN
+		(select house_id from mf_push_log where open_id = #{openId})
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfPushLogEntity">
+		insert into mf_push_log
+		(
+			`id`, 
+			`house_id`, 
+			`open_id`, 
+			`create_time`
+		)
+		values
+		(
+			#{id}, 
+			#{houseId}, 
+			#{openId}, 
+			#{createTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfPushLogEntity">
+		update mf_push_log 
+		<set>
+			<if test="houseId != null">`house_id` = #{houseId}, </if>
+			<if test="openId != null">`open_id` = #{openId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_push_log where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_push_log where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

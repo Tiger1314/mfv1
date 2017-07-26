@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfAdDao">
+
+	<select id="queryObject" resultType="mf.entity.MfAdEntity">
+		select * from mf_ad where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfAdEntity">
+		select * from mf_ad
+		where 1 = 1
+		<if test="type != null">
+			and `type` = #{type}
+		</if>
+		order by `id` desc
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_ad 
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfAdEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_ad
+		(
+			`title`, 
+			`url`, 
+			`status`,
+			`type`
+		)
+		values
+		(
+			#{title}, 
+			#{url}, 
+			#{status},
+			#{type}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfAdEntity">
+		update mf_ad 
+		<set>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="url != null">`url` = #{url}, </if>
+			<if test="status != null">`status` = #{status},</if>
+			<if test="status != null">`type` = #{type}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_ad where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_ad where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="x-rim-auto-match" content="none">
+    <title>闪电房</title>
+    <link rel="stylesheet" href="style/weui.min.css"/>
+    <link rel="stylesheet" href="style/example.css"/>
+    <link rel="stylesheet" href="style/jquery-weui.min.css"/>
+</head>
+<body ontouchstart>
+<div class="weui-toptips weui-toptips_warn js_tooltips">错误提示</div>
+
+<div class="container" id="container"></div>
+
+<script src="js/zepto.min.js"></script>
+<script>
+    $(function(){
+        var debug = false;
+        var httpUrl = debug ? "http://rap.taobao.org/mockjsdata/13783" : "http://www.bmbang.cc";
+        $.ajax({
+            url: httpUrl + '/webcat/getpush',
+            type: 'POST',
+            dataType: 'json',
+            success: function(data){
+                if (!!data) {
+                    if (!!data.push_area) {
+                        window.location.href = '/dist/index.html#filter';
+                    }else{
+                        window.location.href = '/dist/index.html#filter_step01';
+                    }
+                }else{
+                    $.toast("数据不存在", "text");
+                }
+            },
+            error: function(xhr, errorType, error){
+                console.log(error);
+                window.pageManager.go('msg_warn');
+            }
+        });
+    });
+</script>
+</body>
+</html>

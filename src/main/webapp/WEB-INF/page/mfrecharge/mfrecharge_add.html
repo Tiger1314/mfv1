@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div class="panel panel-default" id="rrapp" v-cloak>
+	<div class="panel-heading">{{title}}</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">标题</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.title" placeholder="标题"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">原价</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.oldPrice" placeholder="原价"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">折扣信息</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.discount" placeholder="折扣信息"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">天数</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.days" placeholder="天数"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">价格</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.price" placeholder="价格"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">充值类别</div>
+		   	<div class="col-sm-10">
+		      <!--<input type="text" class="form-control" v-model="mfRecharge.type" placeholder="1 包月  2 蜗牛币"/>-->
+				<select class="form-control" v-model="mfRecharge.type">
+					<option value="1">包月</option>
+					<option value="2">蜗牛币</option>
+				</select>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">蜗牛币</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfRecharge.wnb" placeholder="蜗牛币"/>
+		    </div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="back" value="返回"/>
+		</div>
+	</form>
+</div>
+
+<script src="${rc.contextPath}/js/mfrecharge/mfrecharge_add.js?_${date.systemTime}"></script>
+</body>
+</html>

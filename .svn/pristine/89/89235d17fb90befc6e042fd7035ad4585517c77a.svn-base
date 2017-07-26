@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="mf:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="xezf.war">
+      <element id="artifact" artifact-name="mf:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,11 @@
+jdbc.url=jdbc:mysql://121.40.97.74:3306/fangds_v2?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+jdbc.username=root
+jdbc.password=qq500uc536
+
+jdbc.initialSize=5
+jdbc.maxActive=30
+
+jdbc.minPoolSize=2
+jdbc.maxIdleTime=30000
+jdbc.idleConnectionTestPeriod=100
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mf.dao.MfSourceProfileDao">
+
+	<select id="queryObject" resultType="mf.entity.MfSourceProfileEntity">
+		select * from mf_source_profile where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="mf.entity.MfSourceProfileEntity">
+		select * from mf_source_profile 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from mf_source_profile 
+	</select>
+	 
+	<insert id="save" parameterType="mf.entity.MfSourceProfileEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into mf_source_profile
+		(
+			`source_id`, 
+			`district_code`, 
+			`city_code`, 
+			`province_code`, 
+			`house_type`, 
+			`info_type`, 
+			`profile`, 
+			`status`, 
+			`create_time`, 
+			`update_time`
+		)
+		values
+		(
+			#{sourceId}, 
+			#{districtCode}, 
+			#{cityCode}, 
+			#{provinceCode}, 
+			#{houseType}, 
+			#{infoType}, 
+			#{profile}, 
+			#{status}, 
+			#{createTime}, 
+			#{updateTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="mf.entity.MfSourceProfileEntity">
+		update mf_source_profile 
+		<set>
+			<if test="sourceId != null">`source_id` = #{sourceId}, </if>
+			<if test="districtCode != null">`district_code` = #{districtCode}, </if>
+			<if test="cityCode != null">`city_code` = #{cityCode}, </if>
+			<if test="provinceCode != null">`province_code` = #{provinceCode}, </if>
+			<if test="houseType != null">`house_type` = #{houseType}, </if>
+			<if test="infoType != null">`info_type` = #{infoType}, </if>
+			<if test="profile != null">`profile` = #{profile}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from mf_source_profile where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from mf_source_profile where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

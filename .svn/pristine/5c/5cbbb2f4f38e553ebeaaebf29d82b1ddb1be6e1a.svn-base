@@ -1,0 +1,35 @@
+package mf.service;
+
+import mf.entity.MfHouseCollectEntity;
+import mf.entity.MfHouseInfoEntity;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * 
+ * @author dengfan
+ * @email 283105211@qq.com
+ * @date 2017-03-05 22:33:19
+ */
+public interface MfHouseCollectService {
+	
+	MfHouseCollectEntity queryObject(Integer id);
+	
+	List<MfHouseCollectEntity> queryList(Map<String, Object> map);
+	
+	int queryTotal(Map<String, Object> map);
+	
+	void save(MfHouseCollectEntity mfHouseCollect);
+	
+	void update(MfHouseCollectEntity mfHouseCollect);
+	
+	void delete(Integer id);
+	
+	void deleteBatch(Integer[] ids);
+
+	List<MfHouseInfoEntity> queryMyCollect(Map<String, Object> map);
+
+	void del(MfHouseCollectEntity entity);
+}

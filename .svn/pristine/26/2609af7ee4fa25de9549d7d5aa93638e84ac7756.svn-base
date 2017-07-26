@@ -1,0 +1,135 @@
+package mf.utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * 日期处理
+ * 
+ * @author chenshun
+ * @email sunlightcs@gmail.com
+ * @date 2016年12月21日 下午12:53:33
+ */
+public class DateUtils {
+	/** 时间格式(yyyy-MM-dd) */
+	public final static String DATE_PATTERN = "yyyy-MM-dd";
+	/** 时间格式(yyyy-MM-dd HH:mm:ss) */
+	public final static String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    /** 时间格式(yyyyMMddHHmmss) */
+	public final static String DATE_TIME_PATTERN_N = "yyMMddHHmmss";
+
+	public final static String TIME_PATTERN = "HH:mm:ss";
+
+	public final static String DATE_TIME_PATTERN_CN = "yyyy年MM月DD日 HH:mm";
+	
+	public static String format(Date date) {
+        return format(date, DATE_PATTERN);
+    }
+
+    public static String format(Date date, String pattern) {
+        if(date != null){
+            SimpleDateFormat df = new SimpleDateFormat(pattern);
+            return df.format(date);
+        }
+        return null;
+    }
+
+    /**
+     * 获取当前时间
+     * @return
+     */
+    public static Date getTodayDate(){
+        Calendar calendar = Calendar.getInstance();
+	    return calendar.getTime();
+    }
+
+    /**
+     * 获取N天前的日期
+     * @param past
+     * @return
+     */
+    public static Date getPastDate(int past) {
+         Calendar calendar = Calendar.getInstance();
+         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - past);
+         Date today = calendar.getTime();
+         return today;
+    }
+
+    /**
+     * 获取N天后的日期
+     * @param past
+     * @return
+     */
+    public static Date getFetureDate(int past) {
+         Calendar calendar = Calendar.getInstance();
+         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + past);
+         Date today = calendar.getTime();
+         return today;
+     }
+
+    /**
+     * 获取N天后的日期
+     * @param past
+     * @return
+     */
+    public static Date getFetureDate(Date date, int past) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + past);
+        Date today = calendar.getTime();
+        return today;
+    }
+
+    /**
+     * 获取当前小时
+     * @return
+     */
+    public static int getHour(){
+        Calendar c = Calendar.getInstance();
+        return c.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
+     * 获取当前分钟
+     * @return
+     */
+    public static int getMinute(){
+        Calendar c = Calendar.getInstance();
+        return c.get(Calendar.MINUTE);
+    }
+
+
+    /**
+     * 计算两个时间相差的天数
+     * @param early
+     * @param late
+     * @return
+     */
+    public static int daysBetween(Date early, Date late){
+        long from = early.getTime();
+        long to = late.getTime();
+        int days = (int) ((to - from)/(1000 * 60 * 60 * 24));
+
+        return days;
+    }
+
+    /**
+     * 计算两个时间相差的小时
+     * @param early
+     * @param late
+     * @return
+     */
+    public static int hourBetween(Date early, Date late){
+        long from = early.getTime();
+        long to = late.getTime();
+        int hours = (int) ((to - from)/(1000 * 60 * 60));
+
+        return hours;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(DateUtils.format(DateUtils.getTodayDate(), DATE_TIME_PATTERN_CN));
+    }
+
+}

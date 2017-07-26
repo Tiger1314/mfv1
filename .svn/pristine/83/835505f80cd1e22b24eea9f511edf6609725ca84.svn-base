@@ -1,0 +1,546 @@
+package webcat.controller;
+
+import mf.entity.*;
+import mf.service.*;
+import mf.utils.DateUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import webcat.entity.ParamData;
+import webcat.utils.*;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by dengfan on 2017/3/5.
+ */
+@Controller
+@RequestMapping(value = "/webcat")
+public class WebCatController extends AbstractController {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private MfHouseInfoService mfHouseInfoService;
+    @Autowired
+    private MfUserService mfUserService;
+    @Autowired
+    private MfAreaService mfAreaService;
+    @Autowired
+    private MfRechargeService mfRechargeService;
+    @Autowired
+    private MfHouseClickService mfHouseClickService;
+    @Autowired
+    private MfHouseClickLikeService mfHouseClickLikeService;
+    @Autowired
+    private MfHouseCollectService mfHouseCollectService;
+    @Autowired
+    private MfPushService mfPushService;
+    @Autowired
+    private MfAdService mfAdService;
+    @Autowired
+    private MfRechargeOrderService mfRechargeOrderService;
+    @Autowired
+    private MfPushLogService mfPushLogService;
+
+    /**
+     * 房源广场
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/houselist")
+    public String houselist(){
+        try{
+
+            ParamData pd = this.getParamData();
+
+            //通过订阅设置获取房源
+            Map<String, Object> map = new HashMap<>();
+
+            int page = 0;
+
+            if(StringUtils.isNotBlank(pd.getString("currentPage"))){
+                page = Integer.parseInt(pd.getString("currentPage"));
+            }
+
+            map.put("offset", (page - 1) * limit);
+            map.put("limit", limit);
+            map.put("openId", getOpenId());
+
+            List<MfHouseInfoEntity> list = mfPushLogService.queryMyHouse(map);
+
+            return HouseUtils.getHouses(list).toJSONString();
+
+        }
+        catch(Exception e){
+            logger.error("houselist", e);
+            return sendFailure("系统异常");
+        }
+    }
+
+    /**
+     * 房源详情
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/house")
+    public String house(){
+
+        ParamData pd = this.getParamData();
+
+        String houseId = pd.getString("id");
+
+        if(StringUtils.isBlank(houseId)){
+            return sendFailure("无效的房源ID.");
+        }
+
+        //插入查看记录
+
+        //获取房源详情
+        MfHouseInfoEntity entity = mfHouseInfoService.queryObject(Long.parseLong(houseId));
+
+        return HouseUtils.getHouse(entity).toJSONString();
+    }
+
+    /**
+     * 获取房源手速排行
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/houselistlog")
+    public String houseclickorder(){
+
+        ParamData pd = this.getParamData();
+
+        String houseId = pd.getString("house_id");
+
+        if(StringUtils.isBlank(houseId)){
+            return sendFailure("房源ID无效.");
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("house_id", houseId);
+
+        List<MfHouseClickEntity> list = mfHouseClickService.queryList(map);
+
+        //获取自己的排行
+        MfHouseClickEntity entity = mfHouseClickService.queryObjectByOpenId(getOpenId());
+
+        list.add(1, entity);
+
+        return HouseClickUtil.getHouseClicks(list).toJSONString();
+    }
+
+    /**
+     * 点赞
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/like")
+    public String clicklike(){
+
+        ParamData pd = this.getParamData();
+
+        String clickId = pd.getString("id");
+
+        if(StringUtils.isBlank(clickId)){
+            return sendFailure("点赞失败,ID错误.");
+        }
+        //查询是否点赞过
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("click_id", Integer.valueOf(clickId));
+        map.put("open_id", getOpenId());
+
+        int count = mfHouseClickLikeService.queryTotal(map);
+
+        if(count > 0){
+            return sendFailure("不能重复点赞.");
+        }
+
+        MfHouseClickLikeEntity entity = new MfHouseClickLikeEntity();
+
+        entity.setOpenId(getOpenId());
+        entity.setClickId(Integer.valueOf(clickId));
+        entity.setCreateTime(DateUtils.getTodayDate());
+
+        mfHouseClickLikeService.save(entity);
+
+        return sendSuccess();
+    }
+
+    /**
+     * 一键收藏
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/collect")
+    public String collect(){
+
+        ParamData pd = this.getParamData();
+
+        String houseId = pd.getString("house_id");
+
+        if(StringUtils.isBlank(houseId)){
+            return sendFailure("房源id错误.");
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("house_id", Integer.valueOf(houseId));
+        map.put("openId", getOpenId());
+
+        int count = mfHouseCollectService.queryTotal(map);
+
+        if(count > 0){
+            return sendFailure("不能重复收藏.");
+        }
+
+        MfHouseCollectEntity entity = new MfHouseCollectEntity();
+        entity.setOpenId(getOpenId());
+        entity.setHouseId(Integer.valueOf(houseId));
+        entity.setCreateTime(DateUtils.getTodayDate());
+
+        mfHouseCollectService.save(entity);
+
+        return sendSuccess();
+    }
+
+    /**
+     * 我的收藏
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/mycollect")
+    public String mycollect(){
+        ParamData pd = this.getParamData();
+
+        //通过订阅设置获取房源
+        Map<String, Object> map = new HashMap<>();
+
+        int page = 0;
+
+        if(StringUtils.isNotBlank(pd.getString("currentPage"))){
+            page = Integer.parseInt(pd.getString("currentPage"));
+        }
+
+        map.put("offset", (page - 1) * limit);
+        map.put("limit", limit);
+        map.put("openId", getOpenId());
+
+        List<MfHouseInfoEntity> list = mfHouseCollectService.queryMyCollect(map);
+
+        return HouseUtils.getCollect(list).toJSONString();
+    }
+
+    /**
+     * 获取用户信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/userinfo")
+    public String userinfo(){
+
+        String openId = getOpenId();
+
+        if(StringUtils.isBlank(openId)){
+            return sendFailure("没有获取到用户信息.");
+        }
+
+        MfUserEntity entity = mfUserService.queryObject(openId);
+
+        return UserUtil.getUser(entity).toJSONString();
+    }
+
+    /**
+     * 举报房源
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/housereport")
+    public String housereport(){
+
+        ParamData pd = this.getParamData();
+
+        String id = pd.getString("id");
+
+        if(StringUtils.isBlank(id)){
+            return sendFailure("房源ID错误.");
+        }
+
+        mfHouseInfoService.housereport(Long.valueOf(id));
+
+        return sendSuccess();
+    }
+
+    /**
+     * 获取充值信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getRecharge")
+    public String getrecharge(){
+
+        String openId = getOpenId();
+
+        if(StringUtils.isBlank(openId)){
+            return sendFailure("获取openId失败,无法充值.");
+        }
+
+        List<MfRechargeEntity> l = new LinkedList<MfRechargeEntity>();
+
+        //获取两个包月信息
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        map.put("offset", 0);
+        map.put("limit", 2);
+        map.put("type", 1);
+
+        List<MfRechargeEntity> list = mfRechargeService.queryList(map);
+        l.addAll(list);
+
+        //获取4个蜗牛币信息
+
+        map.clear();
+        map.put("offset", 0);
+        map.put("limit", 4);
+        map.put("type", 2);
+
+        list = mfRechargeService.queryList(map);
+        l.addAll(list);
+
+        return RechargeUtil.getRecharges(l).toJSONString();
+    }
+
+
+    /**
+     * 获取省份，直辖市
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getprovince")
+    public String getprovince(){
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("degree", 1);
+        map.put("parent_code", 0);
+
+        List<MfAreaEntity> list = mfAreaService.queryList(map);
+
+        return AreaUtil.getAreas(list).toJSONString();
+    }
+
+
+    /**
+     * 获取市
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getcity")
+    public String getcity(){
+
+        ParamData pd = this.getParamData();
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("degree", 2);
+        map.put("parent_code", pd.getString("parent_code"));
+
+        List<MfAreaEntity> list = mfAreaService.queryList(map);
+
+        return AreaUtil.getAreas(list).toJSONString();
+    }
+
+    /**
+     * 获取地区
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getcontry")
+    public String getcontry(){
+        ParamData pd = this.getParamData();
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("degree", 3);
+        map.put("parent_code", pd.getString("parent_code"));
+
+        List<MfAreaEntity> list = mfAreaService.queryList(map);
+
+        return AreaUtil.getAreas(list).toJSONString();
+    }
+
+    /**
+     * 获取商圈
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getbusinessdistrict")
+    public String getbusinessdistrict(){
+        ParamData pd = this.getParamData();
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("degree", 4);
+        map.put("parent_code", pd.getString("parent_code"));
+
+        List<MfAreaEntity> list = mfAreaService.queryList(map);
+
+        return AreaUtil.getAreas(list).toJSONString();
+    }
+
+
+    /**
+     * 获取推送设置
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getpush")
+    public String getpush(){
+
+        MfPushEntity entity = mfPushService.queryObject(getOpenId());
+
+        return PushUtil.getPush(entity).toJSONString();
+    }
+
+    /**
+     * 设置推送
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/setpush")
+    public String setpush(){
+
+        MfPushEntity entity = new MfPushEntity();
+
+        ParamData pd = this.getParamData();
+
+        if(StringUtils.isNotBlank(pd.getString("house_type"))){
+            entity.setHouseType(pd.getString("house_type"));
+        }
+
+        if(StringUtils.isNumeric(pd.getString("is_sell"))){
+            entity.setIsSell(Integer.valueOf(pd.getString("is_sell")));
+        }
+        if(StringUtils.isNotBlank(pd.getString("sell_type"))){
+            entity.setSellType(pd.getString("sell_type"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("sell_area"))){
+            entity.setSellArea(pd.getString("sell_area"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("sell_price"))){
+            entity.setSellPrice(pd.getString("sell_price"));
+        }
+
+        if(StringUtils.isNumeric(pd.getString("is_buy"))){
+            entity.setIsBuy(Integer.valueOf(pd.getString("is_buy")));
+        }
+        if(StringUtils.isNotBlank(pd.getString("buy_type"))){
+            entity.setBuyType(pd.getString("buy_type"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("buy_area"))){
+            entity.setBuyArea(pd.getString("buy_area"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("buy_price"))){
+            entity.setBuyPrice(pd.getString("buy_price"));
+        }
+
+        if(StringUtils.isNumeric(pd.getString("is_rent"))){
+            entity.setIsRent(Integer.valueOf(pd.getString("is_rent")));
+        }
+        if(StringUtils.isNotBlank(pd.getString("rent_type"))){
+            entity.setRentType(pd.getString("rent_type"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("rent_area"))){
+            entity.setRentArea(pd.getString("rent_area"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("rent_price"))){
+            entity.setRentPrice(pd.getString("rent_price"));
+        }
+
+        if(StringUtils.isNumeric(pd.getString("is_qz"))){
+            entity.setIsQz(Integer.valueOf(pd.getString("is_qz")));
+        }
+        if(StringUtils.isNotBlank(pd.getString("qz_type"))){
+            entity.setQzType(pd.getString("qz_type"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("qz_area"))){
+            entity.setQzArea(pd.getString("qz_area"));
+        }
+        if(StringUtils.isNotBlank(pd.getString("qz_price"))){
+            entity.setQzPrice(pd.getString("qz_price"));
+        }
+
+        if(StringUtils.isNotBlank(pd.getString("push_area"))){
+            entity.setPushArea(pd.getString("push_area"));
+        }
+
+        mfPushService.save(entity);
+
+        return sendSuccess();
+    }
+
+    /**
+     * 获取广告
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getAd")
+    public String getAd(){
+
+        List<MfAdEntity> list = mfAdService.queryList(new HashMap<String, Object>());
+
+        //取一条广告
+        MfAdEntity entity = new MfAdEntity();
+        if(list != null && list.size() != 0){
+            entity = list.get(0);
+        }
+        MfUserEntity user = mfUserService.queryObject(getOpenId());
+
+        return AdUtil.getAd(entity, user).toJSONString();
+    }
+
+    /**
+     * 获取用户所有消费订单
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getOrderList")
+    public String getOrder(){
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("openid", getOpenId());
+
+        List<MfRechargeOrderEntity> list = mfRechargeOrderService.queryList(map);
+
+        MfUserEntity user = mfUserService.queryObject(getOpenId());
+
+        return OrderUtil.getOrders(list, user.getWnb()).toJSONString();
+    }
+
+    /**
+     * 设置勿扰模式
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/wrset")
+    public String wrset(){
+
+        ParamData pd = this.getParamData();
+
+        MfUserEntity user = new MfUserEntity();
+
+        if(StringUtils.isNotBlank(pd.getString("wrset"))){
+            user.setWrSet(Integer.valueOf(pd.getString("wrset")));
+            user.setOpenId(getOpenId());
+
+            mfUserService.update(user);
+        }
+        return sendSuccess();
+    }
+}

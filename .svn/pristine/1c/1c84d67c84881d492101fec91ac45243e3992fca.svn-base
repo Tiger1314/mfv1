@@ -1,0 +1,177 @@
+package webcat.utils.pay;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import com.alibaba.fastjson.JSON;
+import mf.utils.MD5Util;
+import mf.utils.WXUtil;
+import mf.utils.XMLUtil;
+import webcat.utils.Constants;
+import webcat.utils.HttpClientUtils;
+
+public class PayCommonUtil {
+
+	/**
+	 * 生成签名
+	 * @param characterEncoding
+	 * @param parameters
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static String createSign(String characterEncoding,SortedMap<Object,Object> parameters){
+		StringBuffer sb = new StringBuffer();
+		Set es = parameters.entrySet();
+		Iterator it = es.iterator();
+		while(it.hasNext()) {
+			Map.Entry entry = (Map.Entry)it.next();
+			String k = (String)entry.getKey();
+			Object v = entry.getValue();
+			if(null != v && !"".equals(v) 
+					&& !"sign".equals(k) && !"key".equals(k)) {
+				sb.append(k + "=" + v + "&");
+			}
+		}
+		sb.append("key=" + PayConstants.API_KEY);
+		String sign = MD5Util.MD5Encode(sb.toString(), characterEncoding).toUpperCase();
+		return sign;
+	}
+	
+	/**
+	 * 将参数转换成xml
+	 * @param parameters
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static String getRequestXml(SortedMap<Object,Object> parameters){
+		StringBuffer sb = new StringBuffer();
+		sb.append("<xml>");
+		Set es = parameters.entrySet();
+		Iterator it = es.iterator();
+		while(it.hasNext()) {
+			Map.Entry entry = (Map.Entry)it.next();
+			String k = (String)entry.getKey();
+			String v = (String)entry.getValue();
+			if ("attach".equalsIgnoreCase(k)||"body".equalsIgnoreCase(k)||"sign".equalsIgnoreCase(k)) {
+				sb.append("<"+k+">"+"<![CDATA["+v+"]]></"+k+">");
+			}else {
+				sb.append("<"+k+">"+v+"</"+k+">");
+			}
+		}
+		sb.append("</xml>");
+		return sb.toString();
+	}
+	
+	/**
+	 * 获取微信回调后，返回给微信的xml
+	 * @param return_code
+	 * @param return_msg
+	 * @return
+	 */
+	public static String setXML(String return_code, String return_msg) {
+		return "<xml><return_code><![CDATA[" + return_code
+				+ "]]></return_code><return_msg><![CDATA[" + return_msg
+				+ "]]></return_msg></xml>";
+	}
+	
+	
+	/**
+	 * 
+	 * createPackageValue(调起支付)
+	 * @param prepay_id
+	 * @return 
+	 * @throws
+	 * @author 
+	 * @date
+	 */
+	public static String createPackageValue(String prepay_id) {
+
+		SortedMap<Object, Object> params = new TreeMap<Object, Object>();
+		params.put("appId", Constants.appID);
+		params.put("timeStamp", WXUtil.getTimeStamp());
+		params.put("nonceStr", WXUtil.getNonceStr());
+		params.put("package", "prepay_id=" + prepay_id);
+		params.put("signType", PayConstants.SIGN_TYPE);
+		String paySign = PayCommonUtil.createSign("UTF-8", params);
+		params.put("packageValue", "prepay_id=" + prepay_id); // 这里用packageValue是预防package是关键字在js获取值出错
+		params.put("paySign", paySign);// paySign的生成规则和Sign的生成规则一致
+		params.put("sendUrl", Constants.service + PayConstants.SUCCESS_URL);// 付款成功后跳转的页面
+		String json = JSON.toJSONString(params, true);
+		return json;
+	}
+	 
+	
+	/**
+	 * 
+	 * getPrepayId(调用微信统一下单接口，生成微信预支付id)
+	 * @param totalFee    支付金额
+	 * @param ipAddress   ip地址
+	 * @param orderNumber 订单号
+	 * @param body        商品或支付单简要描述
+	 * @param openid      trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识
+	 * @return
+	 * @throws Exception 
+	 * @throws
+	 * @author dengfan
+	 * @date 
+	 */
+	public static Map<String, String>  getPrepayId(String totalFee,String ipAddress,String orderNumber,String body,String openid) throws Exception{
+		HttpClientUtils hc =  new HttpClientUtils();
+		SortedMap<Object,Object> parameters = new TreeMap<Object,Object>();
+		parameters.put("appid", Constants.appID);
+		parameters.put("mch_id", PayConstants.MCH_ID);
+		parameters.put("nonce_str", WXUtil.getNonceStr());
+		parameters.put("body", body);
+		parameters.put("out_trade_no", orderNumber);
+		parameters.put("total_fee", totalFee);
+		parameters.put("spbill_create_ip",ipAddress);
+		parameters.put("notify_url", Constants.service_controller + PayConstants.NOTIFY_URL);
+		parameters.put("trade_type", "JSAPI");
+		parameters.put("openid", openid);
+		String sign = PayCommonUtil.createSign("UTF-8", parameters);
+		parameters.put("sign", sign);
+		String requestXML = PayCommonUtil.getRequestXml(parameters);
+		String result = hc.post(PayConstants.UNIFIED_ORDER_URL, requestXML);
+		Map<String, String> map = XMLUtil.doXMLParse(result);//解析微信返回的信息，以Map形式存储便于取值
+		return map;
+	}
+	
+	
+	/**
+	 * 
+	 * queryWeiXinOrder(微信订单查询)
+	 * @param orderNumber  订单号
+	 * @return   当返回  return_code="SUCCESS"  
+	 *           和result_code="SUCCESS" 时 获取交易状态SUCCESS—支付成功
+                                                   REFUND—转入退款
+                                                   NOTPAY—未支付
+                                                   CLOSED—已关闭
+                                                   REVOKED—已撤销（刷卡支付）
+                                                   USERPAYING--用户支付中
+                                                   PAYERROR--支付失败(其他原因，如银行返回失败)
+	 * @throws Exception 
+	 * @throws
+	 * @author dengfan
+	 * @date 
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<String, String>  queryWeiXinOrder(String orderNumber) throws Exception{
+		HttpClientUtils hc =  new HttpClientUtils();
+		SortedMap<Object,Object> parameters = new TreeMap<Object,Object>();
+		parameters.put("appid", Constants.appID);
+		parameters.put("mch_id", PayConstants.MCH_ID);
+		parameters.put("nonce_str", WXUtil.getNonceStr());
+		parameters.put("out_trade_no", orderNumber);
+		String sign = PayCommonUtil.createSign("UTF-8", parameters);
+		parameters.put("sign", sign);
+		String requestXML = PayCommonUtil.getRequestXml(parameters);
+		String result = hc.post(PayConstants.CHECK_ORDER_URL, requestXML);
+		Map<String, String> map = XMLUtil.doXMLParse(result);//解析微信返回的信息，以Map形式存储便于取值
+		return map;
+	}
+	
+}

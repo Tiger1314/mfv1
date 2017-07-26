@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>地理信息表（以58为准）</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div class="panel panel-default" id="rrapp" v-cloak>
+	<div class="panel-heading">{{title}}</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">地区code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.code" placeholder="地区code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">地区名称</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.name" placeholder="地区名称"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">地区名称pinyin</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.pinyin" placeholder="地区名称pinyin"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">地区等级（1为省，2为市，3为区,4为商圈）</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.degree" placeholder="地区等级（1为省，2为市，3为区,4为商圈）"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">父级code</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.parentCode" placeholder="父级code"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">是否为直辖市1:是 0:否</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.isMunicipality" placeholder="是否为直辖市1:是 0:否"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">是否为省直辖1:是0:否</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.isProvincemunic" placeholder="是否为省直辖1:是0:否"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label"></div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.createTime" placeholder=""/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label"></div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="mfArea.updateTime" placeholder=""/>
+		    </div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="back" value="返回"/>
+		</div>
+	</form>
+</div>
+
+<script src="${rc.contextPath}/js/mfarea/mfarea_add.js?_${date.systemTime}"></script>
+</body>
+</html>
